@@ -1,3 +1,3 @@
-FlyingFishGame
+FlappyFish
 
 Simple Android Game 
