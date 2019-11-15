@@ -19,9 +19,16 @@ public class FishView extends View {
     private Bitmap background;
     private Bitmap[] life = new Bitmap[2];
     private Paint score = new Paint();
+    private Paint coin = new Paint();
+    private Paint obstacle = new Paint();
 
+    private int scorePoint;
+    private int fishX = 10;
     private int fishY;
     private int fishVelocity;
+    private int coinX;
+    private int coinY;
+    private int obstacleX, obstacleY, obstacleVelocity = 20;
 
     private boolean touch = false;
 
@@ -29,6 +36,7 @@ public class FishView extends View {
         super(context);
 
         background = BitmapFactory.decodeResource(getResources(), R.drawable.background);
+        coin.setColor(Color.YELLOW);
         fish = BitmapFactory.decodeResource(getResources(), R.drawable.fish);
         score.setColor(Color.WHITE);
         score.setTextSize(70);
@@ -39,6 +47,7 @@ public class FishView extends View {
         life[1] = BitmapFactory.decodeResource(getResources(), R.drawable.lost_live);
 
         fishY = 550;
+        scorePoint = 0;
     }
 
     @Override
@@ -49,6 +58,7 @@ public class FishView extends View {
 
         int canvasWidth = getWidth();
         int canvasHeight = getHeight();
+        int coinVelocity = 16;
 
         int minY = fish.getHeight();
         int maxY = canvasHeight - (fish.getHeight() * 3);
@@ -62,7 +72,6 @@ public class FishView extends View {
         }
         fishVelocity += 2;
 
-        int fishX = 10;
         if(touch){
             canvas.drawBitmap(fish, fishX, fishY, null);
             touch = false;
@@ -71,10 +80,27 @@ public class FishView extends View {
             canvas.drawBitmap(fish, fishX, fishY,null);
         }
 
-        canvas.drawText("Score : ", 20, 60, score);
+        coinX -= coinVelocity;
+
+        if(hitCoincheck(coinX,coinY)){
+            scorePoint += 10;
+            coinX = -100;
+        }
+
+        if(coinX < 0){
+            coinX = canvasWidth + 21;
+            coinY = (int) Math.floor(Math.random() * (maxY - minY)) + minY;
+        }
+        canvas.drawCircle(coinX, coinY, 25, coin);
+
+        canvas.drawText("Score : " + scorePoint, 20, 60, score);
         canvas.drawBitmap(life[0], 580, 10, null);
         canvas.drawBitmap(life[0], 680, 10, null);
         canvas.drawBitmap(life[0], 780, 10, null);
+    }
+
+    public boolean hitCoincheck(int x, int y) {
+        return fishX < x && x < (fishX + fish.getWidth()) && fishY < y && y < (fishY + fish.getHeight());
     }
 
     @SuppressLint("ClickableViewAccessibility")
